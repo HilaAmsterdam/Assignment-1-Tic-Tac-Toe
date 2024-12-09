@@ -2,4 +2,11 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="x_color">#8c0000</color> <!-- Red for X -->
+    <color name="o_color">#071076</color> <!-- Blue for O -->
+    <color name="background_color">#FFFFFFFF</color>
+    <color name="button_color">#efedd8</color>
+    <color name="title_color">#374061</color>
+
+
 </resources>

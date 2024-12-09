@@ -1,19 +1,310 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/background_color"
     tools:context=".MainActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <!-- Main Menu Layout -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/main_menu_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/background_color"
+        android:visibility="visible">
+
+        <TextView
+            android:id="@+id/titleTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="180dp"
+            android:text="Tic Tac Toe"
+            android:textSize="40sp"
+            android:textStyle="bold"
+            android:textColor="@color/title_color"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <Button
+            android:id="@+id/startNewGameButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Start New Game"
+            android:backgroundTint="@color/button_color"
+            android:textColor="#374061"
+            android:layout_marginBottom="180dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Game Layout -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/game_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/background_color"
+        android:visibility="gone">
+
+
+        <!-- Player Scores -->
+        <TextView
+            android:id="@+id/player_one_score"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:text="Player 1 Points: 0"
+            android:textSize="18sp"
+            android:textColor="#374061"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/player_two_score"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:text="Player 2 Points: 0"
+            android:textColor="#374061"
+            android:textSize="18sp"
+            app:layout_constraintTop_toBottomOf="@id/player_one_score"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <!-- Current Player -->
+        <TextView
+            android:id="@+id/current_player"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:text="Current Player: X"
+            android:textColor="#374061"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintTop_toTopOf="@id/player_one_score"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/board_container"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintDimensionRatio="1:1"
+            android:gravity="center"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+        <!-- Game Board -->
+        <TextView
+            android:id="@+id/nine"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintDimensionRatio="1:1"
+            android:gravity="center"
+            android:textColor="#000000"
+            android:textSize="32sp"
+            android:layout_margin="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/eight"
+            app:layout_constraintTop_toBottomOf="@+id/six" />
+
+        <TextView
+            android:id="@+id/eight"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintDimensionRatio="1:1"
+            android:gravity="center"
+            android:textColor="#000000"
+            android:textSize="32sp"
+            android:layout_margin="8dp"
+            app:layout_constraintEnd_toStartOf="@+id/nine"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/seven"
+            app:layout_constraintTop_toBottomOf="@+id/five" />
+
+        <TextView
+            android:id="@+id/four"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintDimensionRatio="1:1"
+            android:gravity="center"
+            android:textColor="#000000"
+            android:textSize="32sp"
+            android:layout_margin="8dp"
+            app:layout_constraintEnd_toStartOf="@+id/five"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/one" />
+
+        <TextView
+            android:id="@+id/seven"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintDimensionRatio="1:1"
+            android:gravity="center"
+            android:textColor="#000000"
+            android:textSize="32sp"
+            android:layout_margin="8dp"
+            app:layout_constraintEnd_toStartOf="@+id/eight"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/four" />
+
+            <TextView
+                android:id="@+id/one"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintDimensionRatio="1:1"
+                android:gravity="center"
+                android:textColor="#000000"
+                android:textSize="32sp"
+                android:layout_margin="8dp"
+                app:layout_constraintEnd_toStartOf="@+id/two"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/four" />
+
+            <TextView
+                android:id="@+id/two"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintDimensionRatio="1:1"
+                android:gravity="center"
+                android:textColor="#000000"
+                android:textSize="32sp"
+                android:layout_margin="8dp"
+                app:layout_constraintEnd_toStartOf="@+id/three"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/one"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/five" />
+
+            <TextView
+                android:id="@+id/three"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintDimensionRatio="1:1"
+                android:gravity="center"
+                android:textColor="#000000"
+                android:textSize="32sp"
+                android:layout_margin="8dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/two"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/six" />
+
+        <TextView
+            android:id="@+id/six"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintDimensionRatio="1:1"
+            android:gravity="center"
+            android:textColor="#000000"
+            android:textSize="32sp"
+            android:layout_margin="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/five"
+            app:layout_constraintTop_toBottomOf="@+id/three" />
+
+        <TextView
+            android:id="@+id/five"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintDimensionRatio="1:1"
+            android:gravity="center"
+            android:textColor="#000000"
+            android:textSize="32sp"
+            android:layout_margin="8dp"
+            app:layout_constraintEnd_toStartOf="@+id/six"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/four"
+            app:layout_constraintTop_toBottomOf="@+id/two" />
+
+
+        <View
+            android:id="@+id/view4"
+            android:layout_width="0dp"
+            android:layout_height="4dp"
+            android:background="@color/title_color"
+            app:layout_constraintBottom_toTopOf="@+id/eight"
+            app:layout_constraintEnd_toEndOf="@+id/three"
+            app:layout_constraintStart_toStartOf="@+id/one"
+            app:layout_constraintTop_toTopOf="@+id/eight" />
+
+        <View
+            android:id="@+id/view"
+            android:layout_width="4dp"
+            android:layout_height="0dp"
+            android:background="@color/title_color"
+            app:layout_constraintBottom_toBottomOf="@+id/seven"
+            app:layout_constraintEnd_toStartOf="@+id/two"
+            app:layout_constraintStart_toEndOf="@+id/one"
+            app:layout_constraintTop_toTopOf="@+id/one" />
+
+        <View
+            android:id="@+id/view2"
+            android:layout_width="4dp"
+            android:layout_height="0dp"
+            android:background="@color/title_color"
+            app:layout_constraintBottom_toBottomOf="@+id/seven"
+            app:layout_constraintEnd_toStartOf="@+id/three"
+            app:layout_constraintStart_toEndOf="@+id/two"
+            app:layout_constraintTop_toTopOf="@+id/one" />
+
+        <View
+            android:id="@+id/view3"
+            android:layout_width="0dp"
+            android:layout_height="4dp"
+            android:background="@color/title_color"
+            app:layout_constraintBottom_toBottomOf="@+id/two"
+            app:layout_constraintEnd_toEndOf="@+id/three"
+            app:layout_constraintStart_toStartOf="@+id/one"
+            app:layout_constraintTop_toBottomOf="@+id/two" />
+
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <TextView
+            android:id="@+id/game_result_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="30sp"
+            android:textColor="@color/black"
+            android:visibility="gone"
+            android:textStyle="bold"
+            app:layout_constraintTop_toBottomOf="@+id/player_two_score"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="25dp" />
+
+
+        <!-- Start New Game Button -->
+        <Button
+            android:id="@+id/start_new_game_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Start New Game"
+            android:backgroundTint="@color/button_color"
+            android:textColor="#374061"
+            android:visibility="gone"
+            android:layout_marginBottom="180dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
