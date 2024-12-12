@@ -7,167 +7,177 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 
 class MainActivity : AppCompatActivity() {
+    private data class GameState(
+        val currentPlayer: String = "X",
+        val gameOver: Boolean = false,
+        val scores: Pair<Int, Int> = Pair(0, 0)
+    )
 
-    // Views for Main Menu
-    private lateinit var mainMenuLayout: View
-    private lateinit var startNewGameButton: Button
+    private data class Views(
+        val mainMenu: View,
+        val gameLayout: View,
+        val board: List<List<TextView>>,
+        val startGameButton: Button,
+        val newGameButton: Button,
+        val playerOneScore: TextView,
+        val playerTwoScore: TextView,
+        val currentPlayerView: TextView,
+        val resultMessage: TextView
+    )
 
-    // Views for Game Layout
-    private lateinit var gameLayout: View
-    private lateinit var board: Array<Array<TextView>>
-    private lateinit var startNewGameInGameButton: Button
-    private lateinit var playerOneScoreText: TextView
-    private lateinit var playerTwoScoreText: TextView
-    private lateinit var currentPlayerTextView: TextView
-    private lateinit var gameResultMessage: TextView
-
-    // Game Variables
-    private var currentPlayer = "X"
-    private var gameOver = false
-    private var playerOneScore = 0
-    private var playerTwoScore = 0
+    private lateinit var views: Views
+    private var gameState = GameState()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // Initialize Main Menu Views
-        mainMenuLayout = findViewById(R.id.main_menu_layout)
-        startNewGameButton = findViewById(R.id.startNewGameButton)
+        initializeViews()
+        setupClickListeners()
+        resetBoard()
+    }
 
-        // Initialize Game Layout Views
-        gameLayout = findViewById(R.id.game_layout)
-        startNewGameInGameButton = findViewById(R.id.start_new_game_button)
-        playerOneScoreText = findViewById(R.id.player_one_score)
-        playerTwoScoreText = findViewById(R.id.player_two_score)
-        currentPlayerTextView = findViewById(R.id.current_player)
-        gameResultMessage = findViewById(R.id.game_result_message)
-
-
-        // Initialize Game Board
-        board = arrayOf(
-            arrayOf(findViewById(R.id.one), findViewById(R.id.two), findViewById(R.id.three)),
-            arrayOf(findViewById(R.id.four), findViewById(R.id.five), findViewById(R.id.six)),
-            arrayOf(findViewById(R.id.seven), findViewById(R.id.eight), findViewById(R.id.nine))
+    private fun initializeViews() {
+        views = Views(
+            mainMenu = findViewById(R.id.main_menu_layout),
+            gameLayout = findViewById(R.id.game_layout),
+            board = listOf(
+                listOf(R.id.one, R.id.two, R.id.three),
+                listOf(R.id.four, R.id.five, R.id.six),
+                listOf(R.id.seven, R.id.eight, R.id.nine)
+            ).map { row -> row.map { findViewById(it) } },
+            startGameButton = findViewById(R.id.startNewGameButton),
+            newGameButton = findViewById(R.id.start_new_game_button),
+            playerOneScore = findViewById(R.id.player_one_score),
+            playerTwoScore = findViewById(R.id.player_two_score),
+            currentPlayerView = findViewById(R.id.current_player),
+            resultMessage = findViewById(R.id.game_result_message)
         )
+    }
 
-        // Set Listeners
-        startNewGameButton.setOnClickListener {
-            showGameLayout()
+    private fun setupClickListeners() {
+        views.startGameButton.setOnClickListener { showGameLayout() }
+        views.newGameButton.setOnClickListener { resetGame() }
+        views.board.flatten().forEach { cell ->
+            cell.setOnClickListener { handleMove(cell) }
         }
-
-        startNewGameInGameButton.setOnClickListener {
-            resetGame()
-        }
-
-        initializeBoard()
     }
 
     private fun showGameLayout() {
-        mainMenuLayout.visibility = View.GONE
-        gameLayout.visibility = View.VISIBLE
+        views.mainMenu.visibility = View.GONE
+        views.gameLayout.visibility = View.VISIBLE
         resetGame()
     }
 
-    private fun initializeBoard() {
-        for (row in board) {
-            for (cell in row) {
-                cell.text = ""
-                cell.setOnClickListener { onCellClicked(cell) }
-            }
+    private fun handleMove(cell: TextView) {
+        if (cell.text.isNotEmpty() || gameState.gameOver) return
+
+        cell.apply {
+            text = gameState.currentPlayer
+            setTextColor(getColor(if (gameState.currentPlayer == "X") R.color.x_color else R.color.o_color))
         }
-        updateCurrentPlayer()
+
+        checkGameStatus()?.let { result ->
+            handleGameEnd(result)
+        } ?: switchPlayer()
     }
 
-    private fun onCellClicked(cell: TextView) {
-        if (cell.text.isNotEmpty() || gameOver) return
-
-        cell.text = currentPlayer
-        cell.setTextColor(if (currentPlayer == "X") getColor(R.color.x_color) else getColor(R.color.o_color))
-        if (checkWin()) {
-            gameOver = true
-            startNewGameInGameButton.visibility = View.VISIBLE
-            updateScores()
-            return
-        }
-
-        if (checkDraw()) {
-            gameOver = true
-            startNewGameInGameButton.visibility = View.VISIBLE
-            return
-        }
-
-        currentPlayer = if (currentPlayer == "X") "O" else "X"
-        updateCurrentPlayer()
+    private fun checkGameStatus(): GameResult? = when {
+        isWinningMove() -> GameResult.Win(gameState.currentPlayer)
+        isBoardFull() -> GameResult.Draw
+        else -> null
     }
 
-    private fun displayResult(message: String) {
-        gameResultMessage.text = message
-        gameResultMessage.visibility = View.VISIBLE
-        startNewGameInGameButton.visibility = View.VISIBLE
-        gameOver = true
+    private fun isWinningMove(): Boolean {
+        val board = views.board
+        val player = gameState.currentPlayer
+
+        val winningCombinations = listOf(
+            // Rows
+            { board[0][0].text == player && board[0][1].text == player && board[0][2].text == player },
+            { board[1][0].text == player && board[1][1].text == player && board[1][2].text == player },
+            { board[2][0].text == player && board[2][1].text == player && board[2][2].text == player },
+            // Columns
+            { board[0][0].text == player && board[1][0].text == player && board[2][0].text == player },
+            { board[0][1].text == player && board[1][1].text == player && board[2][1].text == player },
+            { board[0][2].text == player && board[1][2].text == player && board[2][2].text == player },
+            // Diagonals
+            { board[0][0].text == player && board[1][1].text == player && board[2][2].text == player },
+            { board[0][2].text == player && board[1][1].text == player && board[2][0].text == player }
+        )
+
+        return winningCombinations.any { it() }
     }
 
+    private fun isBoardFull(): Boolean =
+        views.board.flatten().none { it.text.isEmpty() }
 
-    private fun checkWin(): Boolean {
-        // Check rows
-        for (i in 0..2) {
-            if (board[i][0].text == currentPlayer && board[i][1].text == currentPlayer && board[i][2].text == currentPlayer) {
-                displayResult("$currentPlayer Wins!")
-                return true
-            }
-        }
-
-        // Check columns
-        for (i in 0..2) {
-            if (board[0][i].text == currentPlayer && board[1][i].text == currentPlayer && board[2][i].text == currentPlayer) {
-                displayResult("$currentPlayer Wins!")
-                return true
-            }
-        }
-
-        // Check diagonals
-        if (board[0][0].text == currentPlayer && board[1][1].text == currentPlayer && board[2][2].text == currentPlayer) {
-            displayResult("$currentPlayer Wins!")
-            return true
-        }
-        if (board[0][2].text == currentPlayer && board[1][1].text == currentPlayer && board[2][0].text == currentPlayer) {
-            displayResult("$currentPlayer Wins!")
-            return true
-        }
-
-        return false
+    private sealed class GameResult {
+        data class Win(val player: String) : GameResult()
+        object Draw : GameResult()
     }
 
-    private fun checkDraw(): Boolean {
-        for (row in board) {
-            for (cell in row) {
-                if (cell.text.isEmpty()) return false
+    private fun handleGameEnd(result: GameResult) {
+        when (result) {
+            is GameResult.Win -> {
+                updateScores()
+                displayResult("${result.player} Wins!")
             }
+            is GameResult.Draw -> displayResult("It's a Tie!")
         }
-        displayResult("It's a Tie!")
-        return true
+        gameState = gameState.copy(gameOver = true)
+        views.newGameButton.visibility = View.VISIBLE
+    }
+
+    private fun switchPlayer() {
+        gameState = gameState.copy(
+            currentPlayer = if (gameState.currentPlayer == "X") "O" else "X"
+        )
+        updateCurrentPlayerDisplay()
     }
 
     private fun updateScores() {
-        if (currentPlayer == "X") {
-            playerOneScore++
-            playerOneScoreText.text = "Player 1 Points: $playerOneScore"
-        } else {
-            playerTwoScore++
-            playerTwoScoreText.text = "Player 2 Points: $playerTwoScore"
+        gameState = gameState.copy(
+            scores = when (gameState.currentPlayer) {
+                "X" -> Pair(gameState.scores.first + 1, gameState.scores.second)
+                else -> Pair(gameState.scores.first, gameState.scores.second + 1)
+            }
+        )
+        updateScoreDisplay()
+    }
+
+    private fun updateScoreDisplay() {
+        views.playerOneScore.text = "Player 1 Points: ${gameState.scores.first}"
+        views.playerTwoScore.text = "Player 2 Points: ${gameState.scores.second}"
+    }
+
+    private fun updateCurrentPlayerDisplay() {
+        views.currentPlayerView.text = "Current Player: ${gameState.currentPlayer}"
+    }
+
+    private fun displayResult(message: String) {
+        views.resultMessage.apply {
+            text = message
+            visibility = View.VISIBLE
         }
     }
 
-    private fun updateCurrentPlayer() {
-        currentPlayerTextView.text = "Current Player: $currentPlayer"
+    private fun resetGame() {
+        gameState = gameState.copy(
+            currentPlayer = "X",
+            gameOver = false
+        )
+        resetBoard()
+        views.apply {
+            newGameButton.visibility = View.GONE
+            resultMessage.visibility = View.GONE
+        }
+        updateCurrentPlayerDisplay()
     }
 
-    private fun resetGame() {
-        gameOver = false
-        currentPlayer = "X"
-        startNewGameInGameButton.visibility = View.GONE
-        gameResultMessage.visibility = View.GONE
-        initializeBoard()
+    private fun resetBoard() {
+        views.board.flatten().forEach { cell ->
+            cell.text = ""
+        }
     }
 }
